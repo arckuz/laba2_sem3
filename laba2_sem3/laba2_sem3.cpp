@@ -2,54 +2,67 @@
 #include <fstream>
 #include <vector>
 #include <iterator>
+#include <sstream>
 
 using namespace std;
 
-struct DAY {
+struct Numbers {
+public:
+	Numbers(int f, int s, int t) {
+		first = f;
+		second = s;
+		third = t;
+	}
+
+	int first;
+	int second;
+	int third;
+};
+
+struct Day {
 public:
 	int day;
-	explicit DAY(int d) {
+	explicit Day(int d) {
 		day = d;
 	}
 };
-struct WEEK {
+struct Week {
 
 	int week;
-	explicit WEEK(int n) {
+	explicit Week(int n) {
 		week = n;
 	}
 };
-struct MONTH {
+struct Month {
 
 	int month;
-	explicit MONTH(int n) {
+	explicit Month(int n) {
 		month = n;
 	}
 };
-struct YEAR {
+struct Year {
 
 	int year;
-	explicit YEAR(int n) {
+	explicit Year(int n) {
 		year = n;
 	}
 };
 
-
-class DATE {
+class Date {
 public:
 
-	DATE() {
+	Date() {
 
 	}
 
-	DATE(int d, int w, int m, int y) {
+	Date(int d, int w, int m, int y) {
 		day = d;
 		week = w;
 		month = m;
 		year = y;
 	}
 
-	DATE(DAY d, WEEK w, MONTH m, YEAR y) {
+	Date(Day d, Week w, Month m, Year y) {
 		day = d.day;
 		week = w.week;
 		month = m.month;
@@ -89,7 +102,57 @@ public:
 		cout << count;
 	}
 
-	
+	Date operator+(Date& Date2) {
+		Date ar1;
+		Date date(GetDay(), GetWeek(), GetMonth(), GetYear());		
+		return ar1.summ(date, Date2);;
+	}
+	Date operator-(Date& Date2) {
+		Date ar1;
+		Date date(GetDay(), GetWeek(), GetMonth(), GetYear());
+		return ar1.sub(date, Date2);;
+	}
+	const bool operator == (Date& Date2)
+	{
+		if (day == Date2.GetDay() && week == Date2.GetWeek() && month == Date2.GetMonth() && year == Date2.GetYear()) {
+			return true;
+		}
+		return false;
+	};
+	const bool operator > (Date& Date2)
+	{
+		if (year > Date2.GetYear()) {
+			return true;
+		}
+		else if (year == Date2.GetYear()) {
+			if (month > Date2.GetMonth()) {
+				return true;
+			}
+			else if (month == Date2.GetMonth()) {
+				if (day > Date2.GetDay()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	const bool operator < (Date& Date2)
+	{
+		if (year > Date2.GetYear()) {
+			return false;
+		}
+		else if (year == Date2.GetYear()) {
+			if (month > Date2.GetMonth()) {
+				return false;
+			}
+			else if (month == Date2.GetMonth()) {
+				if (day > Date2.GetDay()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	};
 
 	void addDay(int d) {
 		it = calendar.begin();
@@ -448,6 +511,32 @@ public:
 		return year;
 	}
 
+	Date sub(Date& date1, Date& date2) {
+		Date newDate;
+		newDate.SetDay(date1.GetDay());
+		newDate.SetWeek(date1.GetWeek());
+		newDate.SetMonth(date1.GetMonth());
+		newDate.SetYear(date1.GetYear());
+
+		newDate.subYear(date2.GetYear());
+		newDate.subMonth(date2.GetMonth());
+		newDate.subWeek(date2.GetWeek());
+		newDate.subDay(date2.GetDay());
+		return newDate;
+	}
+	Date summ(Date& date1, Date& date2) {
+		Date newDate;
+		newDate.SetDay(date1.GetDay());
+		newDate.SetWeek(date1.GetWeek());
+		newDate.SetMonth(date1.GetMonth());
+		newDate.SetYear(date1.GetYear());
+
+		newDate.addYear(date2.GetYear());
+		newDate.addMonth(date2.GetMonth());
+		newDate.addDay(date2.GetDay());
+		return newDate;
+	}
+
 private:
 	int day;
 	int week;
@@ -456,41 +545,13 @@ private:
 	vector<pair<int, int>> calendar = { {1,31},{2,28},{3,31},{4,30},{5,31},{6,30}, {7, 31}, {8,31},{9,30}, {10,31}, {11,30}, {0,31} };
 	vector<pair<int, int>>::iterator it = calendar.begin();
 };
-class ARITHMETIC {
-public:
-	DATE sub(DATE date1, DATE date2) {
-		DATE newDATE;
-		newDATE.SetDay(date1.GetDay());
-		newDATE.SetWeek(date1.GetWeek());
-		newDATE.SetMonth(date1.GetMonth());
-		newDATE.SetYear(date1.GetYear());
 
-		newDATE.subYear(date2.GetYear());
-		newDATE.subMonth(date2.GetMonth());
-		newDATE.subWeek(date2.GetWeek());
-		newDATE.subDay(date2.GetDay());
-		return newDATE;
-	}
-	DATE summ(DATE date1, DATE date2) {
-		DATE newDATE;
-		newDATE.SetDay(date1.GetDay());
-		newDATE.SetWeek(date1.GetWeek());
-		newDATE.SetMonth(date1.GetMonth());
-		newDATE.SetYear(date1.GetYear());
-
-		newDATE.addYear(date2.GetYear());
-		newDATE.addMonth(date2.GetMonth());
-		newDATE.addDay(date2.GetDay());
-		return newDATE;
-	}
-};
-
-ostream& operator <<(ostream& os, DATE& const city) {
-	os << "Your DATE is " << city.GetDay() << " day " << city.GetWeek() << " week  " << city.GetMonth() << " month " << city.GetYear() << " year\n";
+ostream& operator <<(ostream& os, Date& const city) {
+	os << "Your Date is " << city.GetDay() << " day " << city.GetWeek() << " week  " << city.GetMonth() << " month " << city.GetYear() << " year\n";
 	return os;
 }
 
-istream& operator >> (istream& is, DATE& dt)
+istream& operator >> (istream& is, Date& dt)
 {
 	int d, w, m, y;
 	is >> d >> w >> m >> y;
@@ -501,16 +562,101 @@ istream& operator >> (istream& is, DATE& dt)
 	return is;
 }
 
+class FunctionPart {
+public:
+	FunctionPart(char s, double n) {
+		sign1 = s;
+		number = n;
+	}
+	double Evaluate(double n) {
+		if (sign1 == '+') {
+			return n + number;
+		}
+		else if (sign1 == '-') {
+			return n - number;
+		}
+		else if (sign1 == '*') {
+			return n * number;
+		}
+		else if (sign1 == '/') {
+			return n / number;
+		}
+	}
+
+private:
+	char sign1;
+	double number;
+};
+
+class Function {
+public:
+	void Add(char s, double n) {
+		function.push_back({ s, n });
+	}
+	double EvaluateFunction(double num) {
+		for (auto item : function) {
+			num = item.Evaluate(num);
+		}
+		return num;
+	}
+
+private:
+	vector<FunctionPart> function;
+};
+
 int main()
 {
-	DATE DATE1(1, 1, 1, 1984);
-	DATE DATE2;
-	//DATE DATE2(1, 1, 1, 2022);
-	cout << DATE1 << endl;
-	cin >> DATE2;
-	cout << DATE2 << endl;
-	ARITHMETIC ar;
-	//cout << ar.summ(DATE1, DATE2);
-	//cout << ar.sub(ar.summ(DATE1, DATE2), DATE1);
+	Date date1, date2, date3;
 
+	cout << "How do you want to enter and output dates?\n";
+	cout << "1) Console stream;\n";
+	cout << "2) String stream;\n";
+	cout << "3) File stream.\n";
+	int in;
+	cin >> in;
+
+	if (in == 1) {
+		cin >> date1;
+		cin >> date2;
+	}
+	if (in == 2) {
+		stringstream ss;
+		ss << "27 43 10 2022" << "\n";
+		ss >> date1;
+		ss << "1 2 3 4" << "\n";
+		ss >> date2;
+	}
+	if (in == 3) {
+		ifstream in1("C:\\Users\\Arckuz\\Desktop\\input1.txt");
+		if (in1.is_open())
+		{
+			in1 >> date1;
+		}
+		in1.close();
+		ifstream in2("C:\\Users\\Arckuz\\Desktop\\input2.txt");
+		if (in2.is_open())
+		{
+			in2 >> date2;
+		}
+		in2.close();
+	}
+	date3 = date1 + date2;
+	cout << date3;
+	cout << date2;
+
+
+
+
+
+
+
+
+
+
+	Function f;
+	Numbers m(2, 5,8);
+	f.Add('+', m.first);
+	f.Add('+', m.second);
+	f.Add('-', m.third);
+	cout << f.EvaluateFunction(0);
 }
